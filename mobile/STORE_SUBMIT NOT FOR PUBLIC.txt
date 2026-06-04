@@ -1,0 +1,218 @@
+=== Atlas Run: App Store & Play Store Submission ===
+
+Guide for shipping v0.5.0-beta as a standalone build via Expo Application Services (EAS).
+
+See also: V0.5_BETA.txt, PRIVACY.txt, FREE_SETUP.txt
+
+---
+
+--- Prerequisites ---
+
+1. Apple Developer Program ($99/year): https://developer.apple.com/programs/
+2. Google Play Console ($25 one-time): https://play.google.com/console
+3. EAS CLI: npm i -g eas-cli
+4. Expo account: eas login
+5. Link project (once): cd mobile && eas init
+6. Production Supabase project with migrations applied:
+
+```powershell
+cd C:\AtlusRun
+supabase login
+supabase link --project-ref budshszuwsusohjygyik
+supabase db push
+```
+
+Required migrations: 001_v2_schema, 002_security_advisor_fixes, 003_safety_privacy
+
+7. Google Maps API key restricted to bundle ID com.atlasrun.app (iOS + Android)
+8. Privacy policy hosted at public HTTPS URL → set EXPO_PUBLIC_PRIVACY_POLICY_URL
+
+---
+
+--- EAS environment variables (cloud builds) ---
+
+Do not commit production keys. Set via EAS (replaces deprecated `eas secret:create`).
+
+**Easiest:** from `mobile/`, run the script (reads your local `.env`):
+
+```powershell
+cd mobile
+.\scripts\set-eas-env.ps1
+```
+
+Or set manually (project: `budshszuwsusohjygyik`):
+
+```powershell
+cd mobile
+
+npx eas-cli env:create --name EXPO_PUBLIC_SUPABASE_URL --value "https://budshszuwsusohjygyik.supabase.co" --environment development --environment preview --environment production --visibility sensitive --non-interactive --force
+npx eas-cli env:create --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "<from mobile/.env>" --environment development --environment preview --environment production --visibility sensitive --non-interactive --force
+npx eas-cli env:create --name EXPO_PUBLIC_GOOGLE_MAPS_API_KEY --value "<from mobile/.env>" --environment development --environment preview --environment production --visibility sensitive --non-interactive --force
+npx eas-cli env:create --name EXPO_PUBLIC_PRIVACY_POLICY_URL --value "https://your-site.com/privacy" --environment preview --environment production --visibility plaintext --non-interactive --force
+```
+
+Optional map style IDs:
+
+```powershell
+npx eas-cli env:create --name EXPO_PUBLIC_GOOGLE_MAPS_MAP_ID_IOS --value "<from mobile/.env>" --environment development --environment preview --environment production --visibility sensitive --non-interactive --force
+npx eas-cli env:create --name EXPO_PUBLIC_GOOGLE_MAPS_MAP_ID_ANDROID --value "<from mobile/.env>" --environment development --environment preview --environment production --visibility sensitive --non-interactive --force
+```
+
+List variables: `npx eas-cli env:list`
+
+Each `eas.json` build profile uses its matching environment: `development`, `preview`, `production`.
+
+Set EAS_PROJECT_ID in mobile/.env or via eas init (stored in app.config extra.eas.projectId).
+
+---
+
+--- Configure submit credentials ---
+
+Edit mobile/eas.json submit.production section:
+
+iOS:
+- appleId: your Apple ID email
+- ascAppId: numeric App Store Connect app ID
+- appleTeamId: 10-character team ID from developer.apple.com
+
+Android:
+- Download JSON service account key from Play Console → Setup → API access
+- Save as mobile/google-play-service-account.json (add to .gitignore; never commit)
+- serviceAccountKeyPath: "./google-play-service-account.json"
+
+---
+
+--- Build ---
+
+Windows: use **PowerShell** or the included wrappers. Do not paste `$env:...` lines into **Command Prompt (cmd)**. That causes "The filename, directory name, or volume label syntax is incorrect."
+
+**Command Prompt (cmd):**
+
+```cmd
+cd /d C:\AtlusRun\mobile
+eas.cmd build --platform android --profile development
+eas.cmd build --platform ios --profile preview
+```
+
+**PowerShell** (do not use bare `eas`; execution policy blocks `eas.ps1`):
+
+```powershell
+cd C:\AtlusRun\mobile
+$env:EAS_NO_VCS = "1"
+npx eas-cli build --platform ios --profile preview
+```
+
+Or use the project wrapper:
+
+```powershell
+cd C:\AtlusRun\mobile
+.\eas.cmd build --platform ios --profile preview
+```
+
+Or directly (project ID is in app.config.ts):
+
+```powershell
+cd C:\AtlusRun\mobile
+npx eas-cli build --platform android --profile development
+npx eas-cli build --platform ios --profile preview
+```
+
+**First iOS build:** must run **interactively** (not `--non-interactive`) so EAS can sign in to your Apple Developer account and create certificates. Requires Apple Developer Program ($99/yr).
+
+Internal test first:
+
+```powershell
+cd C:\AtlusRun\mobile
+npx eas-cli build --platform ios --profile preview
+npx eas-cli build --platform android --profile preview
+```
+```
+
+Production store builds (auto-increments ios.buildNumber / android.versionCode):
+
+```powershell
+eas build --platform all --profile production
+```
+
+Install on a physical device and verify:
+- Location permission prompt and GPS on map
+- Google Maps tiles (if key configured)
+- Landmark discovery within ~80 m
+- Safe Mode and play safety toggles in Profile
+- Sign in + cloud sync (if Supabase configured)
+
+---
+
+--- Submit ---
+
+After builds complete:
+
+```powershell
+eas submit --platform ios --profile production
+eas submit --platform android --profile production
+```
+
+Or submit a specific build:
+
+```powershell
+eas submit --platform ios --latest
+```
+
+---
+
+--- App Store Connect checklist ---
+
+- App name: Atlas Run
+- Subtitle: Walk Massachusetts. Discover landmarks.
+- Category: Health & Fitness or Games
+- Age rating: complete questionnaire (location-based gameplay)
+- Privacy nutrition labels: Location (gameplay), Photos (optional profile), User Content (optional account)
+- Screenshots: iPhone 6.7" and 5.5" minimum
+- Support URL: your website or GitHub repo
+- Privacy Policy URL: same as EXPO_PUBLIC_PRIVACY_POLICY_URL
+- Export compliance: typically no encryption beyond HTTPS (standard Expo)
+
+---
+
+--- Google Play Console checklist ---
+
+- App name and short description
+- Full description (Massachusetts exploration, Boston + Worcester landmarks)
+- Category: Health & Fitness
+- Content rating questionnaire
+- Data safety form: Location, Photos, Account info (if Supabase enabled)
+- Privacy policy URL
+- Screenshots: phone + 7" tablet if supporting tablets
+- Internal testing track first (eas.json track: internal), then production
+
+---
+
+--- Version numbering ---
+
+| Field | Location | v0.5.0-beta start |
+|-------|----------|-------------------|
+| Marketing version | package.json, app.config.ts, src/config/version.ts | 0.5.0-beta |
+| iOS buildNumber | app.config.ts (from NATIVE_BUILD_VERSION) | 1 |
+| Android versionCode | app.config.ts (from NATIVE_BUILD_VERSION) | 1 |
+
+iOS and Android native build numbers must stay equal. Bump NATIVE_BUILD_VERSION in src/config/version.ts for each store upload (EAS production autoIncrement also applies).
+
+---
+
+--- Troubleshooting ---
+
+- "The filename, directory name, or volume label syntax is incorrect": you ran PowerShell syntax in cmd. Use `eas.cmd` from Command Prompt or `npx eas-cli` in PowerShell.
+- "running scripts is disabled on this system" (eas.ps1 / npx.ps1): do not use bare `eas` or `npx` in PowerShell. Use `.\build-ios.cmd` or `.\eas.cmd` instead.
+- "The input line is too long" when using npx/eas: npm shims blow up cmd line length. Use `.\build-ios.cmd` or `.\eas.cmd` in the mobile folder (calls node directly).
+- Blank map on device: verify EXPO_PUBLIC_GOOGLE_MAPS_API_KEY in EAS env vars and API restrictions
+- Friends / search broken after update: run supabase db push for migration 003
+- Build fails on projectId: run eas init and set EAS_PROJECT_ID
+- Privacy rejection: ensure NSPrivacyPolicyURL is set via EXPO_PUBLIC_PRIVACY_POLICY_URL
+
+---
+
+--- Post-launch ---
+
+- Monitor Supabase usage on free tier
+- Rotate API keys if exposed
+- Update V0.5_BETA.txt or create V0.6 notes for next release

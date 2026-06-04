@@ -1,0 +1,45 @@
+=== Host Atlas Run Privacy Policy (HTTPS) ===
+
+The full policy lives in two formats:
+
+  docs/privacy-policy.html   ← use this URL for stores (web page)
+  mobile/PRIVACY.txt         ← plain text copy for Play Console paste
+
+---
+
+Option A: GitHub Pages (free)
+
+1. Push this repo to GitHub.
+2. Repo Settings → Pages → Source: Deploy from branch `main`, folder `/docs`.
+3. Your URL will be:
+
+   https://YOUR_GITHUB_USERNAME.github.io/AtlasRun/privacy-policy.html
+
+   (Replace AtlasRun with your repo name if different.)
+
+4. In mobile/.env:
+
+   EXPO_PUBLIC_PRIVACY_POLICY_URL=https://YOUR_GITHUB_USERNAME.github.io/AtlasRun/privacy-policy.html
+
+5. Push env to EAS:
+
+   cd mobile
+   .\scripts\set-eas-env.ps1
+
+6. Rebuild iOS/Android production apps so NSPrivacyPolicyURL is embedded.
+
+---
+
+Option B: Any static host
+
+Upload docs/privacy-policy.html to Netlify, Vercel, Cloudflare Pages, or your website.
+Set EXPO_PUBLIC_PRIVACY_POLICY_URL to that HTTPS link.
+
+---
+
+App Store / Play Console
+
+- Paste the same URL in Privacy Policy field.
+- Data safety / privacy labels: Location (required), Photos (optional), Account (optional).
+
+In-app link: Profile → Privacy Policy (opens when URL is configured).

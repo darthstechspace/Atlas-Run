@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "Atlas Run",
+    "slug": "atlas-run",
+    "version": "0.5.0-beta",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "atlasrun",
+    "ios": {
+      "supportsTablet": true,
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Atlas Run needs your location to reveal the map, find treasure chests, and track runs."
+      },
+      "bundleIdentifier": "com.atlasrun.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0F0F1E",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
+      "package": "com.atlasrun.app",
+      "versionCode": 2
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Atlas Run needs your location to reveal the map and find treasure chests."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Atlas Run needs access to your photos for your profile picture.",
+          "cameraPermission": "Atlas Run needs camera access to take a profile picture."
+        }
+      ]
+    ]
+  }
+}

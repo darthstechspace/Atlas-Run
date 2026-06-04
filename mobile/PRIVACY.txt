@@ -1,0 +1,121 @@
+=== Atlas Run Privacy Policy ===
+
+Effective date: June 4, 2026
+App version: 0.5.0-beta
+
+Atlas Run ("Atlas Run," "we," "us," or "our") is a location-based exploration game for iOS and Android. This Privacy Policy explains what information the app collects, how we use it, and the choices you have. By using Atlas Run, you agree to this policy.
+
+HOSTING FOR APP STORES
+----------------------
+Publish the web version at a public HTTPS URL, then set:
+
+  EXPO_PUBLIC_PRIVACY_POLICY_URL=https://your-domain/path/privacy-policy.html
+
+in mobile/.env and run:  .\scripts\set-eas-env.ps1
+
+Canonical HTML file in this repo:  docs/privacy-policy.html
+(GitHub Pages example: https://YOUR_USER.github.io/AtlasRun/privacy-policy.html)
+
+---
+
+1. WHO OPERATES THE APP
+-----------------------
+Atlas Run is published by the developer listed on the Apple App Store and/or Google Play Store listing ("Operator"). For privacy requests, use the support or contact email on that store listing.
+
+2. SUMMARY
+----------
+- Core gameplay requires location (GPS) on your device.
+- You can play offline without an account; progress stays on your phone.
+- Cloud sync is optional (Supabase) when you sign in.
+- We do not sell your personal information.
+- Safe Mode obfuscates location before cloud upload (~500 m grid).
+- Other players do not receive your exact GPS or run routes via social features.
+
+3. INFORMATION WE COLLECT
+
+3.1 Location (required for gameplay)
+With your permission, Atlas Run uses device location to:
+- Show your position on the map
+- Discover landmarks, treasure chests, and fog-of-war areas
+- Track run and ghost-run distance
+- Evaluate play-safety alerts when enabled (e.g., high speed)
+
+Foreground location is used on the Map tab and during runs.
+
+Background location (optional): If you grant "Always" (iOS) or "Allow all the time" (Android), location may update while the screen is off during an active run. You may deny this and keep the app open.
+
+On device: Game save stores progress locally.
+
+In the cloud (signed in + sync): Profile may store last_lat/last_lng to restore map position. With Safe Mode (Profile), coordinates are rounded to an approximate ~500 m grid before upload. Exact GPS used locally is not uploaded when Safe Mode is on.
+
+3.2 Photos and camera (optional)
+Profile pictures from your library or camera are stored locally. With cloud sync, the image may be uploaded as your avatar.
+
+3.3 Account and game data (optional)
+If you create an account:
+- Email and auth identifiers (Supabase Auth)
+- Username and profile fields
+- Game progress: level, XP, gems, cosmetics, quests, badges, landmarks, unlocked areas, runs
+- Friends and friend requests
+- Leaderboard stats (distance, landmarks, fog, level)
+
+Social features show username, optional banner, and aggregate stats, not live location or GPS trails.
+
+3.4 Local device storage
+- AsyncStorage: offline game save and settings
+- SecureStore: encrypted session tokens when signed in
+- Onboarding/tutorial completion flags
+
+3.5 Technical data
+No third-party advertising or cross-app tracking SDKs in this app codebase. Store builds use Expo Application Services (EAS); see https://expo.dev/privacy
+
+4. HOW WE USE INFORMATION
+- Provide gameplay (map, landmarks, runs, shop, quests)
+- Save/restore progress locally and in the cloud if you opt in
+- Friends, leaderboards, and cloud backup when configured
+- Legal compliance and security
+
+5. LEGAL BASES (EEA/UK)
+- Contract: operating the game you requested
+- Consent: location, camera, photos, optional background location
+- Legitimate interests: security and abuse prevention
+
+6. SHARING
+We do not sell personal information. We may share:
+- Service providers you/Operator configure (Google Maps, Supabase, Expo)
+- Other players: limited profile/leaderboard fields only
+- When required by law
+
+7. THIRD-PARTY SERVICES
+- Google Maps (optional): https://policies.google.com/privacy
+- Supabase (optional): https://supabase.com/privacy
+- Expo/EAS (builds): https://expo.dev/privacy
+
+8. YOUR CHOICES
+- Revoke Location/Camera/Photos in device Settings
+- Safe Mode and play safety toggles in Profile
+- Play without signing in (no cloud upload)
+- Sign out; Reset local save (Profile)
+- Request cloud account deletion via Operator or Supabase
+
+9. RETENTION
+- Local: until uninstall or Reset local save
+- Cloud: until account/project data is deleted
+
+10. SECURITY
+HTTPS and provider access controls; on-device encrypted auth tokens. No system is 100% secure.
+
+11. CHILDREN
+Not directed to children under 13. We do not knowingly collect children's data.
+
+12. INTERNATIONAL USERS
+Data may be processed in the US or where providers operate.
+
+13. CALIFORNIA (CCPA/CPRA)
+No sale of personal information. Contact Operator for access/deletion rights.
+
+14. CHANGES
+We may update this policy; effective date will change. Continued use means acceptance.
+
+15. CONTACT
+Use the support email on the App Store or Google Play listing for Atlas Run. Include your account email (if any) and platform (iOS/Android).

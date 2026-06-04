@@ -1,0 +1,21 @@
+# Supabase local dev config (Atlas Run V2)
+project_id = "atlas-run"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "atlasrun://"
+additional_redirect_urls = ["exp://127.0.0.1:8081", "atlasrun://"]
+
+[auth.email]
+enable_signup = true

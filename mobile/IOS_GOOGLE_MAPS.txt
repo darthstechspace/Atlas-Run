@@ -1,0 +1,62 @@
+=== Atlas Run: Google Maps on iOS ===
+
+The mobile app uses Google Maps on iOS when you build a native app (EAS or expo prebuild), not in stock Expo Go.
+
+---
+
+--- Google Cloud (one-time) ---
+
+1. https://console.cloud.google.com/ → APIs & Services → Library
+2. Enable **Maps SDK for iOS** (and Maps SDK for Android if not already)
+3. Credentials → Create API key
+4. Restrict the key:
+   - Application: iOS apps
+   - Bundle ID: **com.atlasrun.app**
+   - Also add Android restriction: **com.atlasrun.app** (same key works for both)
+
+---
+
+--- Project env ---
+
+In mobile/.env:
+
+EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=your-key-here
+EXPO_PUBLIC_GOOGLE_MAPS_MAP_ID_IOS=optional-cloud-style-id
+
+Push the same vars to EAS for cloud builds:
+
+cd mobile
+.\scripts\set-eas-env.ps1
+
+---
+
+--- Build iOS with Google Maps baked in ---
+
+Requires Apple Developer account ($99/year) for device/TestFlight builds.
+
+```powershell
+cd mobile
+npm run fix:city-icons
+.\build-ios-preview.cmd
+```
+
+Or locally (Mac with Xcode):
+
+```powershell
+npx expo prebuild --platform ios
+npx expo run:ios
+```
+
+The config plugin plugins/withAtlasMaps.js installs the Google Maps iOS SDK and calls GMSServices.provideAPIKey at launch (iOS 15.1+).
+
+---
+
+--- Verify ---
+
+- Map tab uses Google tiles (not Apple Maps gray style)
+- Dev log: Map theme: dark, cloud <map-id> (ios)
+- Light/dark map toggle still works (JSON styles when not using cloud style)
+
+---
+
+See also: ANDROID_BUILD.txt, STORE_SUBMIT NOT FOR PUBLIC.txt

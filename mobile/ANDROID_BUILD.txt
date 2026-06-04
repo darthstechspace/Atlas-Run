@@ -1,0 +1,149 @@
+=== Atlas Run: Android app (full build) ===
+
+The complete game lives in mobile/ (Expo + React Native). One codebase builds a real Android APK or Play Store AAB. You do NOT need the Swift AtlasRun/ folder or Apple’s $99/year program for Android.
+
+iOS is optional later. This guide is Android-only.
+
+---
+
+--- What you get on Android ---
+
+| Feature | Works offline? |
+|---------|----------------|
+| Map, GPS, fog-of-war | Yes |
+| ~134 MA landmarks (Boston + Worcester) | Yes |
+| Treasure chests, quests, shop, XP | Yes |
+| Runs + ghost runs (GPS tracking) | Yes |
+| Friends + cloud save | Needs Supabase in .env |
+
+---
+
+--- Path A: Test in Expo Go (free, 5 minutes) ---
+
+```powershell
+cd mobile
+npm install
+npx expo start -c
+```
+
+1. Install Expo Go (SDK 54) from the Play Store
+2. Same Wi‑Fi as your PC (or `npx expo start --tunnel`)
+3. Scan the QR code
+4. Allow location
+
+No store account required. Progress saves on the phone.
+
+---
+
+--- Path B: Standalone APK (install like a real app) ---
+
+Costs: Expo account (free tier builds), optional Google Maps API key.
+
+1. Prerequisites
+
+| Item | Cost |
+|------|------|
+| Google Play Console | $25 one-time (only for public Play Store listing) |
+| EAS CLI | Free tier cloud builds |
+| Expo account | Free |
+
+```powershell
+npm i -g eas-cli
+eas login
+cd mobile
+eas init
+```
+
+Copy `.env.example` to `.env` and set `EAS_PROJECT_ID` from `eas init`.
+
+2. Push secrets to EAS (do not commit .env)
+
+```powershell
+cd mobile
+.\scripts\set-eas-env.ps1
+```
+
+Or set `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` and Supabase vars manually. See STORE_SUBMIT NOT FOR PUBLIC.txt.
+
+3. City seal images (Boston, Salem, Worcester, Springfield)
+
+Seals must be real PNG files for Android release builds. JPEG/WebP renamed to `.png` will fail with `mergeReleaseResources` / AAPT errors.
+
+After adding or replacing seal art:
+
+```powershell
+cd mobile
+npm run fix:city-icons
+```
+
+Icons are written to `assets/city-icons/` and used on the Explore tab.
+
+4. Build an APK you can sideload
+
+```powershell
+cd mobile
+.\build-android-preview.cmd
+```
+
+When the build finishes, open the link EAS prints → download APK → install on your phone (enable “Install unknown apps” if prompted).
+
+Profiles:
+- preview → APK, internal testing
+- production → AAB for Play Store upload
+
+4. Production Play Store build
+
+```powershell
+.\build-android-production.cmd
+```
+
+Upload the `.aab` in Google Play Console → Testing → Internal testing first.
+
+---
+
+--- Path C: Local Android Studio (optional) ---
+
+Requires Android Studio + SDK installed.
+
+```powershell
+cd mobile
+npx expo prebuild --platform android
+npx expo run:android
+```
+
+Generates `android/` (gitignored). Use when debugging native issues; EAS cloud builds are simpler for releases.
+
+---
+
+--- Android-specific settings in this project ---
+
+- Package name: com.atlasrun.app
+- Target SDK 35, min SDK 24
+- Splash screen + adaptive launcher icon
+- Background location + foreground service during runs (screen-off tracking)
+- Google Maps API key via EXPO_PUBLIC_GOOGLE_MAPS_API_KEY (restrict to package com.atlasrun.app)
+
+---
+
+--- Before Play Store submission ---
+
+1. Host docs/privacy-policy.html at a public HTTPS URL (see mobile/legal/HOSTING.txt)
+2. Set EXPO_PUBLIC_PRIVACY_POLICY_URL in .env and run .\scripts\set-eas-env.ps1
+3. Complete Play Console Data safety (Location, optional Photos/Account)
+4. Add google-play-service-account.json (gitignored) for `eas submit`
+
+---
+
+--- Troubleshooting ---
+
+| Problem | Fix |
+|---------|-----|
+| Blank map | Add Google Maps key; enable Maps SDK for Android; restrict key to com.atlasrun.app |
+| GPS works in Expo Go but not APK | Grant Location on the installed app, not Expo Go |
+| Run stops when screen locks | Allow “All the time” location when starting a run |
+| EAS “projectId” error | Run `eas init`, set EAS_PROJECT_ID in .env |
+| Build fails on Windows | Use `.\eas.cmd` or `npx eas-cli`, not bare `eas` in PowerShell |
+
+iOS uses the same mobile/ codebase. See IOS_BUILD.txt and IOS_GOOGLE_MAPS.txt.
+
+See also: FREE_SETUP.txt (if present), PRIVACY.txt

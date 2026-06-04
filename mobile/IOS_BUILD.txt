@@ -1,0 +1,94 @@
+=== Atlas Run: iOS app (same game as Android) ===
+
+The complete game is in mobile/ (Expo + React Native). One codebase builds Android APK/AAB and iOS IPA/TestFlight builds.
+
+You do NOT need the Swift AtlasRun/ folder for the shipping game.
+
+--- Feature parity with Android ---
+
+| Feature | iOS native build | Expo Go on iPhone |
+|---------|------------------|-------------------|
+| Map fog, GPS, landmarks | Yes | Yes (Apple Maps) |
+| Shop, quests, runs, chests | Yes | Yes |
+| Dark/light map toggle | Yes (Google Maps + key) | JSON styles only |
+| Background run GPS | Yes ("Always" location) | Limited |
+| Friends + cloud save | Yes (Supabase) | Yes |
+
+Expo Go on iPhone does not load the Google Maps SDK. Use an EAS iOS build for the same map look as Android.
+
+--- Path A: Test in Expo Go (free) ---
+
+```powershell
+cd mobile
+npm install
+npx expo start -c
+```
+
+Install Expo Go (SDK 54) from the App Store, same Wi‑Fi as your PC, scan the QR code, allow location.
+
+--- Path B: Standalone iOS app (TestFlight / device) ---
+
+Requires Apple Developer Program ($99/year).
+
+1. Google Cloud: enable **Maps SDK for iOS** (and Android). Restrict API key to bundle ID **com.atlasrun.app**.
+
+2. mobile/.env (same vars as Android):
+
+```
+EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=...
+EXPO_PUBLIC_GOOGLE_MAPS_MAP_ID_IOS=...
+EXPO_PUBLIC_SUPABASE_URL=...
+EXPO_PUBLIC_SUPABASE_ANON_KEY=...
+```
+
+Push to EAS:
+
+```powershell
+cd mobile
+.\scripts\set-eas-env.ps1
+```
+
+3. City seal PNGs (Explore tab), same as Android:
+
+```powershell
+npm run fix:city-icons
+```
+
+4. Build:
+
+```powershell
+.\build-ios-preview.cmd
+```
+
+Or production for App Store:
+
+```powershell
+.\build-ios-production.cmd
+```
+
+See IOS_GOOGLE_MAPS.txt for map verification.
+
+--- iOS-specific settings in this project ---
+
+- Bundle ID: com.atlasrun.app
+- Deployment target 15.1+
+- Background location (UIBackgroundModes: location) for screen-off runs
+- Google Maps via plugins/withAtlasMaps.js + GMSApiKey in Info.plist
+- Safe area: tab bar + offline banner respect iPhone notch/home indicator
+
+--- Before App Store submission ---
+
+1. Host docs/privacy-policy.html at a public HTTPS URL (see mobile/legal/HOSTING.txt)
+2. Set EXPO_PUBLIC_PRIVACY_POLICY_URL in .env and run .\scripts\set-eas-env.ps1
+3. Complete App Store privacy (Location, Photos, Account if used)
+
+--- Troubleshooting ---
+
+| Problem | Fix |
+|---------|-----|
+| Gray Apple map instead of styled Google map | Use EAS iOS build, not Expo Go; set Maps SDK for iOS + API key |
+| GPS works in Expo Go but not IPA | Settings → Atlas Run → Location |
+| Run stops when screen locks | Choose "Always" for Location when prompted |
+| Landmarks Found shows 0 on leaderboard | Profile → Sync to Cloud; apply supabase migrations 004 + 005 |
+
+See also: ANDROID_BUILD.txt, IOS_GOOGLE_MAPS.txt
